@@ -11,5 +11,8 @@
     "url": "git+https://github.com/sanji11/fragments.git"
   },
   "author": "Sanjida Afrin",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "2.6.2"
+  }
 }
