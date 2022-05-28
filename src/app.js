@@ -7,6 +7,9 @@ const compression = require('compression');
 const passport = require('passport');
 const authorization = require('./authorization');
 
+// Error response function
+const { createErrorResponse } = require('./response');
+
 const logger = require('./logger');
 const pino = require('pino-http')({
   // Use our default logger instance, which is already configured
@@ -37,13 +40,8 @@ app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    error: {
-      message: 'not found',
-      code: 404,
-    },
-  });
+  const errorResponse = createErrorResponse(404, 'not found');
+  res.status(404).json(errorResponse);
 });
 
 // Add error-handling middleware to deal with anything else
