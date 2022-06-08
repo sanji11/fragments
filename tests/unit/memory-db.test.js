@@ -44,6 +44,16 @@ describe('memory-db', () => {
     expect(results).toEqual([{ value: 1 }, { value: 2 }, { value: 3 }]);
   });
 
+  test('query() returns empty array', async () => {
+    await db.put('b', 'a', { value: 1 });
+    await db.put('b', 'b', { value: 2 });
+    await db.put('b', 'c', { value: 3 });
+
+    const results = await db.query('a');
+    expect(Array.isArray(results)).toBe(true);
+    expect(results).toEqual([]);
+  });
+
   test('del() removes value put() into db', async () => {
     await db.put('a', 'a', { value: 1 });
     expect(await db.get('a', 'a')).toEqual({ value: 1 });
