@@ -76,7 +76,7 @@ describe('Memory', () => {
     //Fragment's data
     const data = Buffer.from([1, 2, 3]);
     await memory.writeFragmentData('z', 'a', data);
-    const resultData = await memory.readFragmentData('a', 'b');
+    const resultData = await memory.readFragmentData('z', 'a');
     expect(resultData).toEqual(data);
 
     //Delete fragment's metadata and data from memory db.
