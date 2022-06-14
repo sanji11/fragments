@@ -1,6 +1,5 @@
 // src/routes/api/post.js
 const logger = require('../../logger');
-const crypto = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 const { Fragment } = require('../../../src/model/fragment');
@@ -24,11 +23,12 @@ module.exports = async (req, res) => {
   const isSupported = Fragment.isSupportedType(type);
   if (isSupported) {
     //Generate a new fragment metadata record for the data,
-    const hashedEmail = crypto.createHash('sha256').update(req.user).digest('hex'); //ownerID
+    //const hashedEmail = crypto.createHash('sha256').update(req.user).digest('hex'); //ownerID
     const size = Number(req.headers['content-length']);
 
     //Store both the data and metadata.
-    const newFragment = new Fragment({ ownerId: hashedEmail, type: type, size: size });
+    console.log(req.user);
+    const newFragment = new Fragment({ ownerId: req.user, type: type, size: size });
     logger.info({ newFragment }, `Text fragment (data and metadata) created`);
     await newFragment.save();
     await newFragment.setData(req.body);
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     /*A successful response returns an HTTP 201.
      It includes a Location header with a full URL to use in order to access the newly created fragment. */
     let successResponse = createSuccessResponse({ fragment: savedFragment });
-    const fullURL = apiUrl + newFragment.id;
+    const fullURL = apiUrl + '/v1/fragments/' + savedFragment.id;
     res.setHeader('location', fullURL);
     res.status(201).json(successResponse);
   } else {

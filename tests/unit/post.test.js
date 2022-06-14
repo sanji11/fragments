@@ -26,7 +26,7 @@ describe('POST /v1/fragments', () => {
     expect(res.body.fragment).toEqual(testFragment.at(0));
     // responses include a Location header with a URL to GET the fragment
     const apiUrl = process.env.API_URL;
-    const fullURL = apiUrl + testFragment.at(0).id;
+    const fullURL = apiUrl + '/v1/fragments/' + testFragment.at(0).id;
     expect(res.headers.location).toEqual(fullURL);
   });
   // trying to create a fragment with an unsupported type errors as expected
