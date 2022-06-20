@@ -1,5 +1,7 @@
 // src/routes/api/getById.js
 const logger = require('../../logger');
+//node path module: https://nodejs.org/api/path.html
+const path = require('node:path');
 // Error response function
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
@@ -12,11 +14,12 @@ module.exports = async (req, res) => {
   //Get the id of the fragment
   var fullId = req.params.id;
   //look for extension if given with the id and remove it to get the id
-  if (fullId.includes('.')) {
-    var extension = fullId.substr(fullId.indexOf('.'));
+  var extension = path.extname(fullId);
+  logger.debug({ extension }, 'Got extension');
+  if (extension) {
     fullId = fullId.substr(0, fullId.indexOf('.'));
   }
-  logger.info({ fullId }, 'Got ID');
+  logger.debug({ fullId }, 'Got ID');
 
   //Get the fragment if there's no extension or if the extension exits, it is .txt since the only supporting type now is 'text/plain'
   if (!extension || extension === '.txt') {

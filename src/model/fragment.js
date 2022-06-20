@@ -117,8 +117,8 @@ class Fragment {
     if (!data) {
       throw new Error(`Buffer is required`);
     }
-    this.updated = new Date().toISOString();
     this.size = data.length;
+    this.save();
     return await writeFragmentData(this.ownerId, this.id, data);
   }
 

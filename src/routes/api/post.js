@@ -23,24 +23,25 @@ module.exports = async (req, res) => {
   const isSupported = Fragment.isSupportedType(type);
   if (isSupported) {
     //Generate a new fragment metadata record for the data,
-    //const hashedEmail = crypto.createHash('sha256').update(req.user).digest('hex'); //ownerID
-    const size = Number(req.headers['content-length']);
-
-    //Store both the data and metadata.
-    console.log(req.user);
-    const newFragment = new Fragment({ ownerId: req.user, type: type, size: size });
-    logger.info({ newFragment }, `Text fragment (data and metadata) created`);
-    await newFragment.save();
-    await newFragment.setData(req.body);
-    const savedFragment = await Fragment.byId(newFragment.ownerId, newFragment.id);
-    logger.info({ savedFragment }, `Text fragment (data and metadata) saved to database`);
-
-    /*A successful response returns an HTTP 201.
-     It includes a Location header with a full URL to use in order to access the newly created fragment. */
-    let successResponse = createSuccessResponse({ fragment: savedFragment });
-    const fullURL = apiUrl + '/v1/fragments/' + savedFragment.id;
-    res.setHeader('location', fullURL);
-    res.status(201).json(successResponse);
+    try {
+      //Store both the data and metadata.
+      const size = Number(req.headers['content-length']);
+      logger.debug(`Got owner ID : ${req.user}`);
+      const newFragment = new Fragment({ ownerId: req.user, type: type, size: size });
+      logger.info({ newFragment }, `Text fragment (data and metadata) created`);
+      await newFragment.save();
+      await newFragment.setData(req.body);
+      /*A successful response returns an HTTP 201.
+      It includes a Location header with a full URL to use in order to access the newly created fragment. */
+      let successResponse = createSuccessResponse({ fragment: newFragment });
+      const fullURL = apiUrl + '/v1/fragments/' + newFragment.id;
+      res.setHeader('location', fullURL);
+      res.status(201).json(successResponse);
+    } catch (error) {
+      //unable to save() and setData()
+      logger.error({ error }, `Unable to save() and setData() for the fragment`);
+      res.status(400).json(createErrorResponse(400, `Unable to save() and setData()`));
+    }
   } else {
     //If unsupported type, returns an HTTP 415 with an appropriate error message.*/
     logger.error({ type }, `Unsupported fragment type`);
