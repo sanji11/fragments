@@ -5,12 +5,12 @@ const wait = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms)
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
-
   `text/markdown`,
   `text/html`,
   `application/json`,
+  /*
+   Currently, only text/* and application/json are supported. Others will be added later.
+
   `image/png`,
   `image/jpeg`,
   `image/webp`,
@@ -19,9 +19,9 @@ const validTypes = [
 ];
 
 describe('Fragment class', () => {
-  /*test('common formats are supported', () => {
+  test('common formats are supported', () => {
     validTypes.forEach((format) => expect(Fragment.isSupportedType(format)).toBe(true));
-  });*/
+  });
 
   describe('Fragment()', () => {
     test('ownerId and type are required', () => {

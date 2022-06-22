@@ -27,7 +27,9 @@ class Fragment {
     }
 
     if (!this.constructor.isSupportedType(type)) {
-      throw new Error(`Invalid types, only 'text/plain' is valid type, got type=${type}`);
+      throw new Error(
+        `Invalid types, 'text/*' and application/json are valid types, got type=${type}`
+      );
     }
 
     if (typeof size != 'number' || size < 0) {
@@ -158,12 +160,12 @@ class Fragment {
 
   /**
    * Returns true if we know how to work with this content type
-   * @param {string} value a Content-Type value (e.g., 'text/plain' or 'text/plain: charset=utf-8')
+   * @param {string} value a Content-Type value (any text/* or application/json fragments : e.g., 'text/plain' or 'text/plain: charset=utf-8')
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
     // TODO
-    if (value === 'text/plain' || value === 'text/plain; charset=utf-8') {
+    if (value.startsWith('text/') || value === 'application/json') {
       return true;
     }
     return false;
