@@ -53,7 +53,7 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('john@email.com', 'test@23')
-      .send('Testing text fragment')
+      .send('# Testing text fragment')
       .set('Content-type', 'text/markdown');
 
     // Get the fragment metadata record for the data
@@ -73,7 +73,7 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('john@email.com', 'test@23')
-      .send('Testing text fragment')
+      .send('<h1> Testing text fragment </h1>')
       .set('Content-type', 'text/html');
 
     // Get the fragment metadata record for the data
@@ -93,7 +93,7 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('john@email.com', 'test@23')
-      .send('Testing text fragment')
+      .send("{'data' : 'Testing text fragment'}")
       .set('Content-type', 'application/json');
 
     // Get the fragment metadata record for the data
