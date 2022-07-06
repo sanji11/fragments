@@ -38,8 +38,8 @@ FROM node:16.15.1-alpine3.15@sha256:1fafca8cf41faf035192f5df1a5387656898bec6ac2f
 
 # Add init process and curl
 RUN apk update && apk add --no-cache \
-    dumb-init \
-    curl
+    dumb-init=1.2.5-r1 \
+    curl=7.80.0-r2
 
 # Use /app as our working directory
 WORKDIR /app
