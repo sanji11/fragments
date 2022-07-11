@@ -1,4 +1,4 @@
-// tests/unit/get.test.js
+// tests/unit/getById.test.js
 
 const request = require('supertest');
 const app = require('../../src/app');
