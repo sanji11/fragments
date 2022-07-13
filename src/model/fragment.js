@@ -154,6 +154,12 @@ class Fragment {
     // TODO
     if (this.mimeType === 'text/plain') {
       return ['text/plain'];
+    } else if (this.mimeType === 'text/markdown') {
+      return ['text/markdown', 'text/html', 'text/plain'];
+    } else if (this.mimeType === 'text/html') {
+      return ['text/html', 'text/plain'];
+    } else if (this.mimeType === 'application/json') {
+      return ['application/json', 'text/plain'];
     }
     return [];
   }

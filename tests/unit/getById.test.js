@@ -47,15 +47,13 @@ describe('GET BY ID /v1/fragments/:id', () => {
       postResponse.body.fragment.ownerId,
       postResponse.body.fragment.id
     );
-    // Unsupported type (.html) throw an error
+    // Unsupported type - image/png (.png) throws an error
     const getResponse = await request(app)
-      .get(`/v1/fragments/${fragment.id}.html`)
+      .get(`/v1/fragments/${fragment.id}.png`)
       .auth('john@email.com', 'test@23')
       .expect(415);
     expect(getResponse.body.status).toBe('error');
-    expect(getResponse.body.error.message).toEqual(
-      'unsupported fragment type; got extension=.html'
-    );
+    expect(getResponse.body.error.message).toEqual('unsupported fragment type; got extension=.png');
   });
 
   //authenticated user with correct fragment ID with supported type/extension can get the fragment
@@ -70,12 +68,54 @@ describe('GET BY ID /v1/fragments/:id', () => {
       postResponse.body.fragment.ownerId,
       postResponse.body.fragment.id
     );
-    // Only supported type now is .txt
+    // One of the supported type is .txt
     const getResponse = await request(app)
       .get(`/v1/fragments/${fragment.id}.txt`)
       .auth('john@email.com', 'test@23')
       .expect(200);
     //Match the fragment text that sent
     expect(getResponse.text).toEqual('Testing text fragment');
+  });
+
+  //authenticated user with correct fragment ID with unable to convert fragment throws 415 error
+  test('authenticated user with correct fragment ID with unable to convert fragment throws 415 error', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('john@email.com', 'test@23')
+      .send('Testing text fragment')
+      .set('Content-type', 'text/plain');
+    // Get the fragment metadata record for the data
+    const fragment = await Fragment.byId(
+      postResponse.body.fragment.ownerId,
+      postResponse.body.fragment.id
+    );
+    // Unsupported conversion .txt to .md throws an error
+    const getResponse = await request(app)
+      .get(`/v1/fragments/${fragment.id}.md`)
+      .auth('john@email.com', 'test@23')
+      .expect(415);
+    expect(getResponse.body.status).toBe('error');
+    expect(getResponse.body.error.message).toEqual(
+      'Unable to convert fragment; got extension type=text/markdown and fragment original type=text/plain'
+    );
+  });
+
+  //authenticated user with correct fragment ID can convert text/markdown to text/html
+  test('authenticated user with correct fragment ID can convert text/markdown to text/html', async () => {
+    const postResponse = await request(app)
+      .post('/v1/fragments')
+      .auth('john@email.com', 'test@23')
+      .send('# Testing text fragment')
+      .set('Content-type', 'text/markdown');
+    // Get the fragment metadata record for the data
+    const fragment = await Fragment.byId(
+      postResponse.body.fragment.ownerId,
+      postResponse.body.fragment.id
+    );
+    // Only supported conversion is from text/markdown to text/html
+    await request(app)
+      .get(`/v1/fragments/${fragment.id}.html`)
+      .auth('john@email.com', 'test@23')
+      .expect(200);
   });
 });
