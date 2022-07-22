@@ -36,4 +36,4 @@ HTTP/1.1 200
 Content-Type: application/json
 Content-Length: 34
 [Asserts]
-body == ```{"data" : "Testing text fragment"}```
+{"data" : "Testing text fragment"}
