@@ -27,6 +27,9 @@ services:
       # something else is defined in the env.
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME:-fragments}
       - AWS_DYNAMODB_TABLE_NAME=${AWS_DYNAMODB_TABLE_NAME:-fragments}
+      - AWS_ACCESS_KEY_ID=ASIASZBMZXQJJCI6EFNB
+      - AWS_SECRET_ACCESS_KEY=hwv3/ug9Uay/Q0PrR/euCmUBZnNH2mwD08ODV+Ea
+      - AWS_SESSION_TOKEN=FwoGZXIvYXdzEJT//////////wEaDGwDTbPjJhhHPK+POiK/AXpBBTDkqYgo1lumSf2F/TkmmiUdFVDnK4aXZo4i3ifJnpog+05lMJ0C/03F/rr5leEkQaa3wBvLomYmRK5Kurh3p/3Rwn9NVpvYvI57JBOvb7PgYdQ9+Un/LeZk1Wd4VCrBYSOI7Ss1of12CUyEh/gk+aZ+w6EJRo606zmqWe1Wfgqp1aLa2ng2jumMXK+CoOUK1U9jukRPpVENDSoSMytSPy9MRszz3l+6DveTsTqfEpHKBjW/2XSU19WNqkCFKJPCgpcGMi0Gtfbjx69lIrGiGkN9Wm/QZZD/WrzGw1qRbMCjZBETj3jKAJGvcyyTHsymIC8=
     # Ports to publish
     ports:
       - '8080:8080'
