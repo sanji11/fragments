@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
   //Get the fragment if there's no extension or if the extension exits, it is supported types (text/*, application/json)
   if (!extension || Fragment.isSupportedType(extensionType)) {
     try {
-      const fragment = await Fragment.byId(req.user, fullId);
+      const fragment = new Fragment(await Fragment.byId(req.user, fullId));
       logger.info({ fragment }, 'Got fragment');
       var fragmentData = await fragment.getData();
       logger.info({ fragmentData }, 'Got fragment data');

@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
   logger.debug({ Id }, 'Got ID');
 
   try {
-    const fragment = await Fragment.byId(req.user, Id);
+    const fragment = new Fragment(await Fragment.byId(req.user, Id));
     logger.info({ fragment }, 'Got fragment');
     const successResponse = createSuccessResponse({ fragment: fragment });
     res.status(200).send(successResponse);
