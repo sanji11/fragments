@@ -105,6 +105,7 @@ module.exports = async (req, res) => {
             const b64 = fragmentData.toString('base64');
             // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
             //const mimeType = 'image/png'; // e.g., image/png
+            res.setHeader('Content-type', fragmentType);
             res.status(200).send(`<img src="data:${fragmentType};base64,${b64}" />`);
           }
 
