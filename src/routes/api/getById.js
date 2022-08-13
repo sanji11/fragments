@@ -98,15 +98,14 @@ module.exports = async (req, res) => {
         if (!extension || fragmentType == extensionType) {
           logger.info({ fragmentType }, 'Final fragment type');
           res.setHeader('Content-type', fragmentType);
-          res.status(200).send(fragmentData);
-          /*if (fragmentType.startsWith('image/')) {
+          if (fragmentType.startsWith('image/')) {
             res.status(200).send(fragmentData.toString('base64'));
             // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
             //const mimeType = 'image/png'; // e.g., image/png
             //res.status(200).send(`<img src="data:${fragmentType};base64,${b64}" />`);
           } else {
             res.status(200).send(fragmentData);
-          }*/
+          }
           /*let filename = 'tests/images/test.jpg';
           fs.writeFile(filename, fragmentData, 'binary', (err) => {
             if (!err) console.log(`${filename} created successfully!`);
