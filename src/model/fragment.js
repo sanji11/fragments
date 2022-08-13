@@ -160,7 +160,15 @@ class Fragment {
       return ['text/html', 'text/plain'];
     } else if (this.mimeType === 'application/json') {
       return ['application/json', 'text/plain'];
+    } else if (
+      this.mimeType === 'image/png' ||
+      this.mimeType === 'image/jpeg' ||
+      this.mimeType === 'image/webp' ||
+      this.mimeType === 'image/gif'
+    ) {
+      return ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
     }
+
     return [];
   }
 
@@ -171,7 +179,7 @@ class Fragment {
    */
   static isSupportedType(value) {
     // TODO
-    if (value.startsWith('text/') || value === 'application/json') {
+    if (value.startsWith('text/') || value === 'application/json' || value.startsWith('image/')) {
       return true;
     }
     return false;

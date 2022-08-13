@@ -4,11 +4,26 @@ const logger = require('../../logger');
 const path = require('node:path');
 // node.js, the same, but with sugar: https://github.com/markdown-it/markdown-it
 const md = require('markdown-it')();
+// https://github.com/stiang/remove-markdown
+const removeMd = require('remove-markdown');
+// https://github.com/html-to-text/node-html-to-text
+const { htmlToText } = require('html-to-text');
 // javascript content-type utility: https://www.npmjs.com/package/mime-types
 const mime = require('mime-types');
 // Error response function
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
+// const fs = require('fs');
+
+function successfulConversionResponse(fragmentData, fragmentType, extensionType, res) {
+  //Update fragment type
+  fragmentType = extensionType;
+  logger.info({ fragmentType }, 'Final fragment type');
+  //Set the header
+  res.setHeader('Content-type', fragmentType);
+  //Send successful response
+  res.status(200).send(fragmentData);
+}
 
 /**
  * Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
@@ -16,9 +31,9 @@ const { Fragment } = require('../../model/fragment');
  */
 module.exports = async (req, res) => {
   //Get the id of the fragment
-  var fullId = req.params.id;
+  let fullId = req.params.id;
   //look for extension if given with the id and remove it to get the id
-  var extension = path.extname(fullId);
+  let extension = path.extname(fullId);
   logger.debug({ extension }, 'Got extension');
   if (extension) {
     var extensionType = mime.lookup(extension);
@@ -32,25 +47,71 @@ module.exports = async (req, res) => {
     try {
       const fragment = new Fragment(await Fragment.byId(req.user, fullId));
       logger.info({ fragment }, 'Got fragment');
-      var fragmentData = await fragment.getData();
+      let fragmentData = await fragment.getData();
       logger.info({ fragmentData }, 'Got fragment data');
-      var fragmentType = fragment.type;
+      let fragmentType = fragment.type;
 
-      /** covert markdown to html (only supported conversion at this moment)*/
+      /******************************* Markdown Conversion **************************/
+      /** covert markdown to html*/
       //check if fragment.type is 'text/markdown' type and extension type is 'text/html'
       if (fragmentType === 'text/markdown' && extensionType === 'text/html') {
-        fragmentType = extensionType;
         fragmentData = md.render(fragmentData.toString());
         logger.info({ fragmentData }, 'Converted fragment data');
-        logger.info({ fragmentType }, 'Final fragment type');
-        res.setHeader('Content-type', fragmentType);
-        res.status(200).send(fragmentData);
+        successfulConversionResponse(fragmentData, fragmentType, extensionType, res);
+      }
+      /** covert markdown to plain*/
+      //check if fragment.type is 'text/markdown' type and extension type is 'text/plain'
+      else if (fragmentType === 'text/markdown' && extensionType === 'text/plain') {
+        //fragmentType = extensionType;
+        fragmentData = removeMd(fragmentData.toString());
+        successfulConversionResponse(fragmentData, fragmentType, extensionType, res);
+      }
+
+      /******************************* HTML Conversion **************************/
+      /** covert html to plain */
+      //check if fragment.type is 'text/html' type and extension type is 'text/plain'
+      else if (fragmentType === 'text/html' && extensionType === 'text/plain') {
+        fragmentData = htmlToText(fragmentData.toString(), {
+          wordwrap: 130,
+          // By default, headings (<h1>, <h2>, etc) are upper cased; Set this to false to leave headings as they are.
+          selectors: [
+            { selector: 'h1', options: { uppercase: false } },
+            { selector: 'h2', options: { uppercase: false } },
+            { selector: 'h3', options: { uppercase: false } },
+            { selector: 'h4', options: { uppercase: false } },
+            { selector: 'h5', options: { uppercase: false } },
+            { selector: 'h6', options: { uppercase: false } },
+          ],
+        });
+        //fragmentData = fragmentData.toString().replace(/<[^>]*>/g, '');
+        successfulConversionResponse(fragmentData, fragmentType, extensionType, res);
+      }
+
+      /******************************* Application/json Conversion **************************/
+      /** covert application/json to plain */
+      //check if fragment.type is 'application/json' type and extension type is 'text/plain'
+      else if (fragmentType === 'application/json' && extensionType === 'text/plain') {
+        fragmentData = fragmentData.toString();
+        successfulConversionResponse(fragmentData, fragmentType, extensionType, res);
       } else {
         // if there is no extension or extension is same as fragment type
         if (!extension || fragmentType == extensionType) {
           logger.info({ fragmentType }, 'Final fragment type');
           res.setHeader('Content-type', fragmentType);
           res.status(200).send(fragmentData);
+          if (fragmentType.startsWith('image/')) {
+            console.log('********************************');
+            console.log(fragmentData.toString('base64'));
+            const b64 = fragmentData.toString('base64');
+            // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
+            //const mimeType = 'image/png'; // e.g., image/png
+            res.status(200).send(`<img src="data:${fragmentType};base64,${b64}" />`);
+          }
+
+          /*let filename = 'tests/images/test.jpg';
+          fs.writeFile(filename, fragmentData, 'binary', (err) => {
+            if (!err) console.log(`${filename} created successfully!`);
+          });*/
         } else {
           //If the fragment cannot be converted to the requested type, returns an HTTP 415 with an appropriate error message.
           logger.error({ extensionType }, `Unable to convert fragment`);
