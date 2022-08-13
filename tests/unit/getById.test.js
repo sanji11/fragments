@@ -47,13 +47,15 @@ describe('GET BY ID /v1/fragments/:id', () => {
       postResponse.body.fragment.ownerId,
       postResponse.body.fragment.id
     );
-    // Unsupported type - image/png (.png) throws an error
+    // Unsupported type - text/csv (.csv) throws an error
     const getResponse = await request(app)
-      .get(`/v1/fragments/${fragment.id}.png`)
+      .get(`/v1/fragments/${fragment.id}.csv`)
       .auth('john@email.com', 'test@23')
       .expect(415);
     expect(getResponse.body.status).toBe('error');
-    expect(getResponse.body.error.message).toEqual('unsupported fragment type; got extension=.png');
+    expect(getResponse.body.error.message).toEqual(
+      'Unable to convert fragment; got extension type=text/csv and fragment original type=text/plain'
+    );
   });
 
   //authenticated user with correct fragment ID with supported type/extension can get the fragment

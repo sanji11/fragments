@@ -114,9 +114,11 @@ describe('POST /v1/fragments', () => {
       .post('/v1/fragments')
       .auth('john@email.com', 'test@23')
       .send('Testing text fragment')
-      .set('Content-type', 'image/png');
+      .set('Content-type', 'application/msword');
     expect(res.statusCode).toBe(415);
     expect(res.body.status).toBe('error');
-    expect(res.body.error.message).toEqual('unsupported fragment type; got type=image/png');
+    expect(res.body.error.message).toEqual(
+      'unsupported fragment type; got type=application/msword'
+    );
   });
 });
