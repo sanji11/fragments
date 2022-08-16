@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     const type = req.get('content-type');
     logger.debug({ type }, 'Got requested content type');
     // Get the requested fragment
-    const fragment = await Fragment.byId(req.user, req.params.id);
+    const fragment = new Fragment(await Fragment.byId(req.user, req.params.id));
     if (fragment.type == type) {
       //The entire request body is used to update the fragment's data, replacing the original value
       await fragment.setData(req.body);
