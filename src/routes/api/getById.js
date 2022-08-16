@@ -40,6 +40,8 @@ module.exports = async (req, res) => {
   if (extension) {
     var extensionType = mime.lookup(extension);
     fullId = fullId.substr(0, fullId.indexOf('.'));
+  } else {
+    extensionType = '';
   }
   logger.debug({ extensionType }, 'Got extension type');
   logger.debug({ fullId }, 'Got ID');
