@@ -10,10 +10,12 @@ const removeMd = require('remove-markdown');
 const { htmlToText } = require('html-to-text');
 // javascript content-type utility: https://www.npmjs.com/package/mime-types
 const mime = require('mime-types');
+//Image conversion library: https://sharp.pixelplumbing.com
+const sharp = require('sharp');
 // Error response function
 const { createErrorResponse } = require('../../response');
+
 const { Fragment } = require('../../model/fragment');
-// const fs = require('fs');
 
 function successfulConversionResponse(fragmentData, fragmentType, extensionType, res) {
   //Update fragment type
@@ -93,6 +95,20 @@ module.exports = async (req, res) => {
       else if (fragmentType === 'application/json' && extensionType === 'text/plain') {
         fragmentData = fragmentData.toString();
         successfulConversionResponse(fragmentData, fragmentType, extensionType, res);
+      }
+      /******************************* Image Conversion **************************/
+      /** covert image to image/png, image/jpeg, image/webp, image/gif */
+      //check if fragment.type is 'image/' type and extension type is 'image'
+      else if (fragmentType.startsWith('image/') && extensionType.startsWith('image/')) {
+        //remove the first dot - .png -> png
+        extension = extension.substring(1);
+        let convertedImageData = await sharp(fragmentData).toFormat(extension).toBuffer();
+        successfulConversionResponse(
+          convertedImageData.toString('base64'),
+          fragmentType,
+          extensionType,
+          res
+        );
       } else {
         // if there is no extension or extension is same as fragment type
         if (!extension || fragmentType == extensionType) {
@@ -100,16 +116,10 @@ module.exports = async (req, res) => {
           res.setHeader('Content-type', fragmentType);
           if (fragmentType.startsWith('image/')) {
             res.status(200).send(fragmentData.toString('base64'));
-            // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
-            //const mimeType = 'image/png'; // e.g., image/png
             //res.status(200).send(`<img src="data:${fragmentType};base64,${b64}" />`);
           } else {
             res.status(200).send(fragmentData);
           }
-          /*let filename = 'tests/images/test.jpg';
-          fs.writeFile(filename, fragmentData, 'binary', (err) => {
-            if (!err) console.log(`${filename} created successfully!`);
-          });*/
         } else {
           //If the fragment cannot be converted to the requested type, returns an HTTP 415 with an appropriate error message.
           logger.error({ extensionType }, `Unable to convert fragment`);
